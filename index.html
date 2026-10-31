@@ -1,0 +1,1190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Chat - AI Assistant</title>
+
+<style>
+:root {
+    --bg: #0b1020;
+    --sidebar: #10172a;
+    --surface: #151e33;
+    --surface2: #1c2840;
+    --text: #f5f7ff;
+    --muted: #9ba9c4;
+    --accent: #8b5cf6;
+    --accent2: #6366f1;
+    --border: rgba(255,255,255,.09);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    display: flex;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 23px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg,#8b5cf6,#6366f1);
+    border-radius: 13px;
+    font-size: 22px;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: white;
+    border-radius: 11px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+    margin-bottom: 12px;
+    transition: .2s;
+}
+
+.sidebar button:hover {
+    background: var(--surface2);
+    border-color: var(--accent);
+}
+
+.sidebar-title {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 25px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sidebar-info {
+    margin-top: auto;
+    padding: 15px;
+    background: var(--surface);
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+/* MAIN */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* HEADER */
+
+.header {
+    min-height: 75px;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(16,23,42,.8);
+}
+
+.header h2 {
+    font-size: 18px;
+}
+
+.header p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header button {
+    background: var(--surface2);
+    color: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.header button:hover {
+    background: var(--accent);
+}
+
+.online {
+    color: #4ade80;
+    font-size: 12px;
+}
+
+/* CHAT AREA */
+
+.chat-area {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 30px 20px;
+}
+
+.chat-container {
+    max-width: 850px;
+    margin: auto;
+}
+
+/* WELCOME SCREEN */
+
+.intro {
+    text-align: center;
+    padding-top: 9vh;
+}
+
+.welcome-icon {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 25px;
+    display: grid;
+    place-items: center;
+    border-radius: 23px;
+    font-size: 35px;
+    background: linear-gradient(135deg,#8b5cf6,#4f46e5);
+    box-shadow: 0 10px 40px rgba(139,92,246,.25);
+}
+
+.intro h1 {
+    font-size: clamp(28px,5vw,42px);
+    margin-bottom: 15px;
+    background: linear-gradient(90deg,#c4b5fd,#818cf8);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.intro p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* SUGGESTIONS */
+
+.suggestions {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 14px;
+    margin-top: 40px;
+}
+
+.suggestion {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: left;
+    cursor: pointer;
+    color: white;
+    transition: .2s;
+}
+
+.suggestion:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    background: var(--surface2);
+}
+
+.suggestion span {
+    font-size: 22px;
+}
+
+.suggestion h3 {
+    font-size: 14px;
+    margin: 12px 0 6px;
+}
+
+.suggestion p {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* CHAT MESSAGES */
+
+#chat {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding-bottom: 25px;
+}
+
+.message {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    animation: appear .25s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: bold;
+    background: #293650;
+}
+
+.message.assistant .avatar {
+    background: linear-gradient(135deg,#8b5cf6,#6366f1);
+}
+
+.message-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.message-name {
+    font-size: 13px;
+    font-weight: bold;
+    margin: 5px 0 10px;
+}
+
+.message-text {
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: #dce4f5;
+}
+
+.message.user .message-text {
+    display: inline-block;
+    background: linear-gradient(135deg,#6546c7,#5145b8);
+    padding: 12px 16px;
+    border-radius: 5px 15px 15px 15px;
+    color: white;
+}
+
+/* TYPING */
+
+.typing {
+    display: flex;
+    gap: 6px;
+    padding: 10px 0;
+}
+
+.typing span {
+    width: 7px;
+    height: 7px;
+    background: #a78bfa;
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: .4s;
+}
+
+@keyframes pulse {
+    0%,100% {
+        opacity: .3;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-5px);
+    }
+}
+
+/* INPUT */
+
+.composer-section {
+    padding: 15px 20px 20px;
+    background: linear-gradient(transparent,var(--bg) 30%);
+}
+
+.composer-container {
+    max-width: 850px;
+    margin: auto;
+}
+
+.composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 13px 15px;
+    background: var(--surface);
+    border: 1px solid #35415b;
+    border-radius: 17px;
+    box-shadow: 0 8px 35px rgba(0,0,0,.2);
+}
+
+.composer:focus-within {
+    border-color: var(--accent);
+}
+
+textarea {
+    flex: 1;
+    resize: none;
+    min-height: 28px;
+    max-height: 130px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+textarea::placeholder {
+    color: #8592aa;
+}
+
+#sendButton {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#8b5cf6,#6366f1);
+    color: white;
+    font-size: 21px;
+    cursor: pointer;
+}
+
+#sendButton:hover {
+    opacity: .85;
+}
+
+#sendButton:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.hint {
+    text-align: center;
+    color: #77839b;
+    font-size: 11px;
+    margin-top: 12px;
+}
+
+.status {
+    color: #f87171;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+    min-height: 18px;
+}
+
+/* SETTINGS MODAL */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 18px;
+    z-index: 10;
+}
+
+.modal-backdrop.open {
+    display: flex;
+}
+
+.modal {
+    width: min(420px,100%);
+    background: #18233b;
+    border: 1px solid var(--border);
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+
+.modal h2 {
+    font-size: 21px;
+    margin-bottom: 10px;
+}
+
+.modal p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+}
+
+.modal input {
+    width: 100%;
+    padding: 13px;
+    background: #0d1527;
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 10px;
+    outline: none;
+}
+
+.modal input:focus {
+    border-color: var(--accent);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 10px 15px;
+    border-radius: 9px;
+    cursor: pointer;
+    border: none;
+}
+
+.cancel {
+    background: var(--surface2);
+    color: white;
+}
+
+.save {
+    background: var(--accent);
+    color: white;
+}
+
+/* MOBILE */
+
+@media(max-width:750px) {
+    .sidebar {
+        display: none;
+    }
+
+    .header {
+        padding: 0 15px;
+    }
+
+    .header h2 {
+        font-size: 16px;
+    }
+
+    .header-right {
+        gap: 6px;
+    }
+
+    .header button {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .chat-area {
+        padding: 20px 14px;
+    }
+
+    .intro {
+        padding-top: 6vh;
+    }
+
+    .suggestions {
+        grid-template-columns: 1fr;
+        margin-top: 30px;
+    }
+
+    .composer-section {
+        padding: 10px 12px 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">✦</div>
+        Get Chat
+    </div>
+
+    <button class="new-chat-button">＋ &nbsp; New Chat</button>
+
+    <button class="settings-button">⚙ &nbsp; API Settings</button>
+
+    <div class="sidebar-title">Your AI Assistant</div>
+
+    <div class="sidebar-info">
+        <strong style="color:white;">Get Chat AI</strong>
+        <br>
+        Powered by Google Gemini.
+        <br>
+        Ask anything and explore new ideas with AI.
+    </div>
+
+</aside>
+
+<!-- MAIN AREA -->
+
+<main class="main">
+
+    <header class="header">
+
+        <div>
+            <h2>AI Assistant</h2>
+            <p>Chat, learn and create with AI</p>
+        </div>
+
+        <div class="header-right">
+            <span class="online">● Online</span>
+            <button class="new-chat-button" type="button">＋</button>
+            <button class="settings-button" type="button">⚙</button>
+        </div>
+
+    </header>
+
+    <section class="chat-area">
+        <div class="chat-container">
+
+            <!-- WELCOME SCREEN -->
+
+            <section class="intro" id="intro">
+
+                <div class="welcome-icon">✦</div>
+
+                <h1>What can I help you with?</h1>
+
+                <p>
+                    Welcome to Get Chat AI.
+                    <br>
+                    Ask questions, learn something new or explore your creativity.
+                </p>
+
+                <div class="suggestions">
+
+                    <button class="suggestion"
+                        data-prompt="Explain artificial intelligence in simple English.">
+                        <span>💡</span>
+                        <h3>Learn Something</h3>
+                        <p>Understand difficult topics easily.</p>
+                    </button>
+
+                    <button class="suggestion"
+                        data-prompt="Give me some creative project ideas for computer science students.">
+                        <span>🚀</span>
+                        <h3>Generate Ideas</h3>
+                        <p>Discover creative ideas and solutions.</p>
+                    </button>
+
+                    <button class="suggestion"
+                        data-prompt="Teach me Python programming with a simple example.">
+                        <span>💻</span>
+                        <h3>Write Code</h3>
+                        <p>Learn programming with examples.</p>
+                    </button>
+
+                    <button class="suggestion"
+                        data-prompt="Give me tips to improve my communication skills.">
+                        <span>🎯</span>
+                        <h3>Get Advice</h3>
+                        <p>Get helpful suggestions and guidance.</p>
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- CHAT MESSAGES -->
+
+            <section id="chat" aria-live="polite"
+                aria-label="Chat messages">
+            </section>
+
+        </div>
+    </section>
+
+    <!-- MESSAGE INPUT -->
+
+    <section class="composer-section">
+
+        <div class="composer-container">
+
+            <form class="composer" id="chatForm">
+
+                <textarea
+                    id="promptInput"
+                    rows="1"
+                    placeholder="Message Get Chat AI..."
+                    aria-label="Message Get Chat AI"></textarea>
+
+                <button id="sendButton" type="submit"
+                    title="Send message" aria-label="Send message">
+                    ↑
+                </button>
+
+            </form>
+
+            <p class="hint">
+                Enter to send · Shift + Enter for a new line
+            </p>
+
+            <p class="status" id="status" role="status"></p>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- API SETTINGS MODAL -->
+
+<div class="modal-backdrop" id="settingsModal"
+    role="dialog" aria-modal="true"
+    aria-labelledby="settingsTitle">
+
+    <div class="modal">
+
+        <h2 id="settingsTitle">⚙ Connect Gemini AI</h2>
+
+        <p>
+            Enter your Gemini API key to start chatting
+            with your AI assistant.
+            The key is stored in this browser tab's session storage.
+        </p>
+
+        <input
+            id="apiKeyInput"
+            type="password"
+            placeholder="Enter Gemini API key"
+            autocomplete="off">
+
+        <div class="modal-actions">
+
+            <button class="cancel" id="cancelSettings"
+                type="button">Cancel</button>
+
+            <button class="save" id="saveSettings"
+                type="button">Save Key</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// =====================================
+// GEMINI API CONFIGURATION
+// =====================================
+
+const MODEL = "gemini-3.8-flash";
+
+const API_URL =
+`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+// =====================================
+// GET HTML ELEMENTS
+// =====================================
+
+const chat = document.getElementById("chat");
+const intro = document.getElementById("intro");
+const form = document.getElementById("chatForm");
+const promptInput = document.getElementById("promptInput");
+const sendButton = document.getElementById("sendButton");
+const status = document.getElementById("status");
+const settingsModal = document.getElementById("settingsModal");
+const apiKeyInput = document.getElementById("apiKeyInput");
+
+let conversation = [];
+let isSending = false;
+
+// =====================================
+// API KEY SETTINGS
+// =====================================
+
+function getApiKey() {
+    return sessionStorage.getItem("gemini_api_key") || "";
+}
+
+function openSettings() {
+    apiKeyInput.value = getApiKey();
+    settingsModal.classList.add("open");
+    apiKeyInput.focus();
+}
+
+function closeSettings() {
+    settingsModal.classList.remove("open");
+}
+
+document.querySelectorAll(".settings-button").forEach(button => {
+    button.addEventListener("click", openSettings);
+});
+
+document.getElementById("cancelSettings")
+    .addEventListener("click", closeSettings);
+
+document.getElementById("saveSettings")
+    .addEventListener("click", () => {
+
+        const key = apiKeyInput.value.trim();
+
+        if (!key) {
+            apiKeyInput.focus();
+            status.textContent = "Please enter your API key.";
+            return;
+        }
+
+        sessionStorage.setItem("gemini_api_key", key);
+
+        closeSettings();
+
+        status.textContent = "API key saved successfully.";
+
+        setTimeout(() => {
+            status.textContent = "";
+        }, 2500);
+    });
+
+settingsModal.addEventListener("click", event => {
+    if (event.target === settingsModal) {
+        closeSettings();
+    }
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeSettings();
+    }
+});
+
+// =====================================
+// NEW CHAT
+// =====================================
+
+document.querySelectorAll(".new-chat-button").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        if (isSending) return;
+
+        conversation = [];
+
+        chat.replaceChildren();
+
+        intro.style.display = "block";
+
+        status.textContent = "";
+
+        promptInput.value = "";
+        promptInput.style.height = "auto";
+
+        promptInput.focus();
+    });
+
+});
+
+// =====================================
+// ADD MESSAGE
+// =====================================
+
+function addMessage(role, text) {
+
+    intro.style.display = "none";
+
+    const message = document.createElement("article");
+    message.className = `message ${role}`;
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = role === "user" ? "YOU" : "AI";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const name = document.createElement("div");
+    name.className = "message-name";
+    name.textContent = role === "user" ? "You" : "Get Chat AI";
+
+    const body = document.createElement("div");
+    body.className = "message-text";
+
+    // Safely display message text.
+    body.textContent = text;
+
+    content.append(name, body);
+    message.append(avatar, content);
+
+    chat.append(message);
+
+    scrollToBottom();
+
+    return message;
+}
+
+// =====================================
+// AUTO SCROLL
+// =====================================
+
+function scrollToBottom() {
+
+    const area = document.querySelector(".chat-area");
+
+    area.scrollTo({
+        top: area.scrollHeight,
+        behavior: "smooth"
+    });
+
+}
+
+// =====================================
+// TYPING INDICATOR
+// =====================================
+
+function addTypingIndicator() {
+
+    intro.style.display = "none";
+
+    const message = document.createElement("article");
+    message.className = "message assistant";
+    message.id = "typingIndicator";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "AI";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const name = document.createElement("div");
+    name.className = "message-name";
+    name.textContent = "Get Chat AI";
+
+    const dots = document.createElement("div");
+    dots.className = "typing";
+
+    dots.innerHTML = "<span></span><span></span><span></span>";
+
+    content.append(name, dots);
+    message.append(avatar, content);
+
+    chat.append(message);
+
+    scrollToBottom();
+}
+
+// =====================================
+// LOADING STATE
+// =====================================
+
+function setBusy(busy) {
+
+    isSending = busy;
+
+    sendButton.disabled = busy;
+    promptInput.disabled = busy;
+
+    sendButton.textContent = busy ? "…" : "↑";
+}
+
+// =====================================
+// API REQUEST WITH AUTOMATIC RETRY
+// =====================================
+
+async function fetchWithRetry(url, options, maxRetries = 3) {
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+
+        let response;
+
+        try {
+
+            response = await fetch(url, options);
+
+        } catch (error) {
+
+            // Retry temporary network failures.
+            if (attempt === maxRetries) {
+                throw error;
+            }
+
+            const delay = 1000 * (2 ** attempt);
+
+            status.textContent =
+                `Network problem. Retrying (${attempt + 1}/${maxRetries})...`;
+
+            await new Promise(resolve => setTimeout(resolve, delay));
+
+            continue;
+        }
+
+        if (response.ok) {
+            return response;
+        }
+
+        const retryableErrors = [408, 429, 500, 502, 503, 504];
+
+        if (!retryableErrors.includes(response.status)
+            || attempt === maxRetries) {
+            return response;
+        }
+
+        const delay = 1000 * (2 ** attempt)
+                    + Math.random() * 500;
+
+        status.textContent =
+            `Gemini is busy. Retrying (${attempt + 1}/${maxRetries})...`;
+
+        await new Promise(resolve => setTimeout(resolve, delay));
+    }
+
+    throw new Error("Unable to connect to Gemini. Please try again.");
+}
+
+// =====================================
+// SEND MESSAGE TO GEMINI
+// =====================================
+
+async function sendMessage(text) {
+
+    const apiKey = getApiKey();
+
+    if (!apiKey) {
+
+        openSettings();
+
+        status.textContent =
+            "Add your Gemini API key to start chatting.";
+
+        return;
+    }
+
+    setBusy(true);
+
+    status.textContent = "";
+
+    addMessage("user", text);
+
+    addTypingIndicator();
+
+    const requestContents = [
+        ...conversation,
+        {
+            role: "user",
+            parts: [{ text }]
+        }
+    ];
+
+    try {
+
+        const response = await fetchWithRetry(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey
+            },
+
+            body: JSON.stringify({
+
+                contents: requestContents,
+
+                generationConfig: {
+                    maxOutputTokens: 2048
+                }
+
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            const apiMessage =
+                data?.error?.message || `HTTP ${response.status}`;
+
+            throw new Error(apiMessage);
+        }
+
+        const answer =
+            (data?.candidates?.[0]?.content?.parts || [])
+            .map(part => part.text || "")
+            .join("")
+            .trim();
+
+        if (!answer) {
+
+            throw new Error(
+                data?.promptFeedback?.blockReason
+                    ? `Request blocked: ${data.promptFeedback.blockReason}`
+                    : "Gemini returned an empty response. Please try again."
+            );
+
+        }
+
+        // SAVE SUCCESSFUL CONVERSATION
+
+        conversation.push(
+            {
+                role: "user",
+                parts: [{ text }]
+            },
+            {
+                role: "model",
+                parts: [{ text: answer }]
+            }
+        );
+
+        document.getElementById("typingIndicator")?.remove();
+
+        addMessage("assistant", answer);
+
+    } catch (error) {
+
+        document.getElementById("typingIndicator")?.remove();
+
+        status.textContent = `Error: ${error.message}`;
+
+    } finally {
+
+        setBusy(false);
+
+        promptInput.focus();
+    }
+}
+
+// =====================================
+// FORM SUBMISSION
+// =====================================
+
+form.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    const text = promptInput.value.trim();
+
+    if (!text || isSending) return;
+
+    promptInput.value = "";
+
+    promptInput.style.height = "auto";
+
+    await sendMessage(text);
+});
+
+// =====================================
+// AUTO RESIZE TEXTAREA
+// =====================================
+
+promptInput.addEventListener("input", () => {
+
+    promptInput.style.height = "auto";
+
+    promptInput.style.height =
+        `${Math.min(promptInput.scrollHeight, 130)}px`;
+
+});
+
+// =====================================
+// ENTER KEY TO SEND
+// =====================================
+
+promptInput.addEventListener("keydown", event => {
+
+    if (event.key === "Enter" && !event.shiftKey) {
+
+        event.preventDefault();
+
+        form.requestSubmit();
+    }
+
+});
+
+// =====================================
+// SUGGESTED PROMPTS
+// =====================================
+
+document.querySelectorAll(".suggestion").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        if (isSending) return;
+
+        promptInput.value = button.dataset.prompt;
+
+        form.requestSubmit();
+
+    });
+
+});
+
+// =====================================
+// FIRST TIME API KEY SETUP
+// =====================================
+
+if (!getApiKey()) {
+
+    setTimeout(openSettings, 300);
+
+}
+
+</script>
+
+</body>
+</html>
